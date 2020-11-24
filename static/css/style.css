@@ -1,0 +1,15 @@
+header {
+    background-color: grey;
+    border: 5px darkred solid;
+    font-family: "Comic Sans MS", cursive, sans-serif;
+    padding: 0px;
+    text-align: center;
+}
+
+h1 {
+    font-size: 50px;
+}
+
+h2 {
+    font-size: 20px;
+}

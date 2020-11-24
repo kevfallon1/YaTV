@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="jumbotron">
+      <h5 class="display-4">Shows on your MyList</h5>
+      {% for show in showlist %}
+        <a href="{{ url_for('showpage', showID=show['ShowID']) }}">
+            <h2 style="color:#9932CC;">{{ show['Title'] }}</h2>
+        </a>
+        <span class="badge badge-dark">{{ show['Description'][:75] + (show['Description'][75:] and '...') }}</span>
+        <hr>
+    {% endfor %}
+        </div>
+    <div class="jumbotron">
+    <h5 class="display-4">Videos on your MyList</h5>
+      {% for video in videolist %}
+        <a href="#">
+            <h2 style="color:#9932CC;">{{ video['Title'] }}</h2>
+        </a>
+        <span class="badge badge-dark">{{ video['Description'][:75] + (video['Description'][75:] and '...') }}</span>
+        <hr>
+    {% endfor %}
+    </div>
+{% endblock %}

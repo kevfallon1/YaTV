@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="jumbotron">
+      <h5 class="display-4">Most Watched on YaTV</h5>
+      {% for show in showlist %}
+        <a style="color:#9932CC;" href="#">
+            <h2>{{ show['Top10Shows'] }}</h2>
+        </a>
+        <span class="badge badge-dark">{{ show['App'] }}</span>
+        <hr>
+    {% endfor %}
+    </div>
+{% endblock %}

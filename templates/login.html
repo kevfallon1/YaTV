@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<div class="jumbotron">
+    <div id="formContent my-auto">
+      <h1 class="display-4">Login</h1>
+      <hr>
+      <!-- Login Form -->
+      <form method="post">
+        <input type="text" id="login" class="form-control" name="email" placeholder="Enter Email"
+        value="{{ request.form['email'] }}">
+        <input type="text" id="password" class="form-control" name="password" placeholder="Enter Password"
+        value="{{ request.form['password'] }}">
+        <input type="submit" class="btn btn-primary" value="Log In">
+      </form>
+  
+      <!-- Create account -->
+      <div id="formFooter">
+        Don't have an account? <a class="underlineHover" href="{{url_for('create')}}">Sign Up</a>
+      </div>
+  
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="jumbotron">
+      <h5 class="display-4">Free on YaTV</h5>
+      {% for video in videos %}
+        <a style="color:#9932CC;" href="#">
+            <h2>{{ video['title'] }}</h2>
+        </a>
+        {% for platform in platforms %}
+            {% if video['id'] == platform['id'] %}
+                <span class="badge badge-dark">{{ platform['name'] }}</span>
+                {% endif %}
+            {% endfor %}
+        <hr>
+    {% endfor %}
+    </div>
+{% endblock %}

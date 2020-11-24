@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="jumbotron">
+      <h5 class="display-4">Popular Tags on YaTV</h5>
+      {% for tag in tags %}
+        <a style="color:#9932CC;" >
+            <h2>{{ tag['top3'] }}</h2>
+        </a>
+        <span class="badge badge-dark">{{ tag['numwatched'] }} Videos Watched</span>
+        <hr>
+    {% endfor %}
+    </div>
+{% endblock %}

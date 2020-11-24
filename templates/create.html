@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<div class="jumbotron">
+    <div id="formContent">
+      <h1 class="display-4">Create Account</h1>
+      <hr>
+  
+      <!-- Create User Form -->
+      <form method="post">
+        <input type="text" id="create" class="form-control" name="fname" placeholder="Enter First Name"
+        value="{{ request.form['fname'] }}">
+        <input type="text" id="create" class="form-control" name="lname" placeholder="Enter Last Name"
+        value="{{ request.form['lname'] }}">
+        <input type="email" id="create" class="form-control" name="email" placeholder="Enter Email"
+        value="{{ request.form['email'] }}">
+        <input type="text" id="create" class="form-control" name="password" placeholder="Enter Password"
+        value="{{ request.form['password'] }}">
+        <input type="text" id="create" class="form-control" name="country" placeholder="Enter Country of Residence"
+        value="{{ request.form['country'] }}">
+        <input type="submit" class="btn btn-primary" value="Create Account">
+      </form>
+  
+    </div>
+  </div>
+{% endblock %}

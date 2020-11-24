@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="jumbotron">
+      <h5 class="display-4">Admin Panel</h5>
+      <form method="post">
+        <textarea id="admin" class="form-control" name="admin" placeholder="Enter query"
+        value="{{ request.form['admin'] }}" rows="3">
+        </textarea>
+      </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="jumbotron">
+    <h4 class="display-3">{{ show['Title'] }}</h4>
+    <p class="lead">{{ show['Description'] }}</p>
+    <form action="{{ url_for('addshow', showid=show['ShowID']) }}" method="POST">
+        <input type="submit" value="Add to List"
+                class="btn btn-primary btn-lg"
+                onclick="return confirm('Are you sure you want to add this show to your MyList?')">
+        </form>
+    <hr class="my-4">
+    <p>
+      {% for season in seasons %}
+            <a >
+                {% if show['ShowID'] == season['showid'] %}
+            <div class="container">
+                    <h2 class="display-4">Season {{ season['seasonnumber'] }}.</h2>
+                    <hr>
+                    {% for video in seasonvideos %}
+                {% if video['showid'] == show['showid'] and video['seasonnumber'] == season['seasonnumber'] %}
+                    <h4 style="color:#9932CC;">{{ video['videotitle'] }}</h4>
+                    {% endif %}
+                {% endfor %}
+                </div>
+                    {% endif %}
+            </a>
+            
+            {% endfor %}
+  </div>
+
+{% endblock %}

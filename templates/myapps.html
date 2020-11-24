@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="jumbotron">
+      <h5 class="display-4">Apps you are subscribed to</h5>
+      {% for app in applist %}
+        <a style="color:#9932CC;" href="{{ url_for('AppPage', appName=app['Name']) }}">
+            <h2>{{ app['Name'] }}</h2>
+        </a>
+        <span class="badge badge-dark">{{ app['Description'] }}</span>
+        <form action="{{ url_for('unsubscribe', appName=app['Name']) }}" method="POST">
+            <input type="submit" value="Unsubscribe"
+                    class="btn btn-danger btn-sm"
+                    onclick="return confirm('Are you sure you want to unsubscribe from this app?')">
+            </form>
+        <hr>
+    {% endfor %}
+    </div>
+{% endblock %}

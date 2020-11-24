@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="jumbotron">
+    <form action="action_page.php" method="post"> 
+      </form>
+      <h3 style="font-style:italic">Choose from our world-class selection of streaming services</h5>
+      {% for app in apps %}
+            <a style="color:#9932CC;"href="{{ url_for('AppPage', appName=app['Name']) }}">
+                <h2>{{ app['Name'] }}</h2>
+            </a>
+            <span style="color:#9932CC;" class="badge badge-dark text-white display-4">
+                {{ app['Description'][:75] + (app['Description'][75:] and '...')}}</span>
+            </form>
+        <hr>
+    {% endfor %}
+        </div>
+{% endblock %}
