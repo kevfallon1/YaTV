@@ -7,9 +7,6 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'akdfsj;fdkasjfa;dksfj'
 login = LoginManager(app)
 
-#user = "ericweiss@gmail.com"
-
-
 class User(UserMixin):
 	def __init__(self, fname, lname, id, password, country, is_admin):
 		self.fname = fname
@@ -196,8 +193,8 @@ def unsubscribe(appName):
 		flash("You must be logged in to unsubscribe from an app.")
 		return redirect(url_for('login'))
 	conn = get_db_connection()
-	conn.execute('DELETE FROM appsubscription WHERE AppName = ?',
-				(appName,))
+	conn.execute('DELETE FROM appsubscription WHERE AppName = ? AND UserEmail = ?',
+				(appName, current_user.id))
 	conn.commit()
 	conn.close()
 
