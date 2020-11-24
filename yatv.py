@@ -82,7 +82,7 @@ def mylist():
 	showlist = conn.execute("SELECT shows.Title, shows.Description, shows.ShowID FROM user INNER JOIN showlist ON user.Email = "
 							+ "showlist.UserEmail INNER JOIN shows ON showlist.ShowID = shows.ShowID WHERE user.Email='"
 							+ useremail + "'ORDER BY shows.Title").fetchall()
-	videolist = conn.execute("SELECT video.Title, video.Description FROM user INNER JOIN videolist ON user.Email = "
+	videolist = conn.execute("SELECT video.Title, video.Description, video.VideoID FROM user INNER JOIN videolist ON user.Email = "
 							+ "videolist.UserEmail INNER JOIN video ON videolist.VideoID = video.VideoID WHERE user.Email='"
 							+ useremail + "'ORDER BY video.Title").fetchall()
 	conn.close()
@@ -310,6 +310,38 @@ def removeshow(showid):
 	conn.close()
 
 	flash("Show removed from your MyList")
+	return redirect(url_for('mylist'))
+
+@app.route('/<videoid>/addvideo', methods=('POST',))
+def addvideo(videoid):
+	if not current_user.is_authenticated:
+		flash("You must be logged in to add a video to your MyList")
+		return redirect('login')
+	conn = get_db_connection()
+	current = conn.execute("SELECT video.VideoID, video.Title, User.Email"
+			+ " FROM user INNER JOIN videolist ON user.Email = videolist.UserEmail"
+			+ " INNER JOIN video on videolist.VideoID = video.VideoID"
+			+ " WHERE videolist.UserEmail = '" + current_user.id + "'AND video.VideoID = '" + videoid + "'").fetchone()
+	if current:
+		flash(current['Title'] + " is already on your MyList")
+		return redirect(url_for('index'))
+	conn.execute('INSERT INTO videolist (UserEmail, VideoID) VALUES (?, ?)',
+				(current_user.id, videoid))
+	conn.commit()
+	conn.close()
+
+	flash("Video successfully added to your MyList")
+	return redirect(url_for('mylist'))
+
+@app.route('/<videoid>/removevideo', methods=('POST',))
+def removevideo(videoid):
+	conn = get_db_connection()
+	conn.execute('DELETE FROM videolist WHERE VideoID = ? AND UserEmail = ?',
+				(videoid, current_user.id))
+	conn.commit()
+	conn.close()
+
+	flash("Video removed from your MyList")
 	return redirect(url_for('mylist'))
 
 @app.route('/admin')

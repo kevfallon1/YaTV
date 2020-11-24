@@ -4,7 +4,7 @@
     <div class="jumbotron">
       <h5 class="display-4">Free on YaTV</h5>
       {% for video in videos %}
-        <a style="color:#9932CC;" href="#">
+        <a style="color:#9932CC;" href="{{ url_for('videopage', videoID=video['id']) }}">
             <h2>{{ video['title'] }}</h2>
         </a>
         {% for platform in platforms %}

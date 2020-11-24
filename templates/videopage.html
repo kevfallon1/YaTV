@@ -5,10 +5,10 @@
 <div class="jumbotron">
     <h4 class="display-3">{{ video['Title'] }}</h4>
     <p class="lead">{{ video['Description'] }}</p>
-    <form method="POST">
+    <form action="{{ url_for('addvideo', videoid=video['VideoID']) }}" method="POST">
         <input type="submit" value="Add to List"
                 class="btn btn-primary btn-lg"
-                onclick="return confirm('Are you sure you want to add this show to your MyList?')">
+                onclick="return confirm('Are you sure you want to add this video to your MyList?')">
         </form>
     <hr class="my-4">
     <p class="lead">

@@ -19,10 +19,15 @@
     <div class="jumbotron">
     <h5 class="display-4">Videos on your MyList</h5>
       {% for video in videolist %}
-        <a href="#">
+        <a href="{{ url_for('videopage', videoID=video['VideoID']) }}">
             <h2 style="color:#9932CC;">{{ video['Title'] }}</h2>
         </a>
         <span class="badge badge-dark">{{ video['Description'][:75] + (video['Description'][75:] and '...') }}</span>
+        <form action="{{ url_for('removevideo', videoid=video['VideoID']) }}" method="POST">
+            <input type="submit" value="Remove from List"
+                    class="btn btn-danger btn-sm"
+                    onclick="return confirm('Are you sure you want to remove this video from your list?')">
+            </form>
         <hr>
     {% endfor %}
     </div>
