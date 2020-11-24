@@ -20,7 +20,10 @@
                     <hr>
                     {% for video in seasonvideos %}
                 {% if video['showid'] == show['showid'] and video['seasonnumber'] == season['seasonnumber'] %}
-                    <h4 style="color:#9932CC;">{{ video['videotitle'] }}</h4>
+                <!--{{ url_for('videopage', videoID = video['videoid']) }} -->
+                    <a href="#">
+                        <h4 style="color:#9932CC;">{{ video['videotitle'] }}</h4>
+                    </a>
                     {% endif %}
                 {% endfor %}
                 </div>

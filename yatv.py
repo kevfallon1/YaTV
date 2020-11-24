@@ -91,7 +91,7 @@ def mylist():
 @app.route('/mostwatched')
 def mostwatched():
 	conn = get_db_connection()
-	showlist = conn.execute("SELECT shows.Title AS Top10Shows, app.Name AS App"
+	showlist = conn.execute("SELECT shows.Title AS Top10Shows, shows.ShowID, app.Name AS App"
 							+ " FROM app INNER JOIN video ON video.HostingApp = app.Name"
 							+ " INNER JOIN season ON season.SeasonID = video.Season"
 							+ " INNER JOIN seasonshow ON season.ShowID = seasonshow.ShowID"
@@ -236,16 +236,19 @@ def showpage(showID):
 			+ " ON season.ShowID = seasonshow.ShowID AND"
     		+ " season.SeasonNumber = seasonshow.SeasonNumber"
     		+ " INNER JOIN shows ON seasonshow.ShowID = shows.ShowID ORDER BY season.SeasonNumber").fetchall()
-	seasonvideos = conn.execute("SELECT video.Title as videotitle, video.Description as videodescription, "
+	seasonvideos = conn.execute("SELECT video.Title as videotitle, video.Description as videodescription, video.VideoID as videoid,"
 			+ " season.SeasonNumber as seasonnumber, shows.ShowID as showid FROM video INNER JOIN season ON video.Season = season.SeasonID"
 			+ " INNER JOIN seasonshow ON season.ShowID = seasonshow.ShowID AND season.SeasonNumber = seasonshow.SeasonNumber"
         	+ " INNER JOIN shows ON seasonshow.ShowID = shows.ShowID").fetchall()
 	conn.close()
 	return render_template('showpage.html', show=show, seasons=seasons, seasonvideos=seasonvideos) 
 
-@app.route('/<videoname>/videopage')
-def videopage(videoName):
-	return
+@app.route('/<videoID>/videopage')
+def videopage(videoID):
+	conn = get_db_connection()
+	video = conn.execute("SELECT * FROM video WHERE video.VideoID = '" + videoID + "'").fetchone()
+	conn.close()
+	return render_template('videopage.html', video=video)
 
 @app.route('/populartags')
 def populartags():
