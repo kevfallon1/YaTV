@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="jumbotron">
+      <h5 class="display-4">Recent Movies</h5>
+      {% for video in videos %}
+        <a style="color:#9932CC;" href="{{ url_for('videopage', videoID=video['id']) }}">
+            <h2>{{ video['title'] }}</h2>
+        </a>
+        <hr>
+    {% endfor %}
+    </div>
+{% endblock %}

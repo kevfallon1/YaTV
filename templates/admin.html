@@ -7,6 +7,53 @@
         <textarea id="admin" class="form-control" name="admin" placeholder="Enter query"
         value="{{ request.form['admin'] }}" rows="3">
         </textarea>
+        <input type="submit" class="btn btn-primary" value="Submit Query">
       </form>
+    </div>
+    <div class="jumbotron">
+      <div id="formContent">
+        <h1 class="display-4">Update App Version</h1>
+        <hr>
+    
+        <!-- Create User Form -->
+        <form method="post">
+          <input type="text" id="updateapp" class="form-control" name="appname" placeholder="Enter App Name"
+          value="{{ request.form['appname'] }}">
+          <input type="text" id="updateapp" class="form-control" name="platformid" placeholder="Enter PlatformID"
+          value="{{ request.form['platformid'] }}">
+          <input type="text" id="updateapp" class="form-control" name="newversion" placeholder="Enter Updated Version"
+          value="{{ request.form['newversion'] }}">
+          <input type="submit" class="btn btn-primary" value="Update">
+        </form>
+    
+      </div>
+    </div>
+    <div class="jumbotron">
+      <div id="formContent">
+        <h1 class="display-4">Add New Video</h1>
+        <hr>
+    
+        <!-- Create User Form -->
+        <form method="post">
+          <input type="text" id="newvideo" class="form-control" name="videoid" placeholder="Enter VideoID"
+          value="{{ request.form['videoid'] }}">
+          <input type="text" id="newvideo" class="form-control" name="title" placeholder="Enter Title"
+          value="{{ request.form['title'] }}">
+          <input type="text" id="newvideo" class="form-control" name="description" placeholder="Enter Description"
+          value="{{ request.form['description'] }}">
+          <input type="text" id="newvideo" class="form-control" name="ReleaseDate" placeholder="Enter Release Date FORMAT: XXXX-XX-XX, YEAR,MONTH,DAY"
+          value="{{ request.form['releasedate'] }}">
+          <input type="text" id="newvideo" class="form-control" name="Duration" placeholder="Enter Duration FORMAT: 00:00:00, HOURS:MINUTES:SECONDS"
+          value="{{ request.form['duration'] }}">
+          <input type="text" id="newvideo" class="form-control" name="isFree" placeholder="Enter free"
+          value="{{ request.form['isfree'] }}">
+          <input type="text" id="newvideo" class="form-control" name="hostingapp" placeholder="Enter Hosting App"
+          value="{{ request.form['hostingapp'] }}">
+          <input type="text" id="newvideo" class="form-control" name="season" placeholder="Enter Season"
+          value="{{ request.form['season'] }}">
+          <input type="submit" class="btn btn-primary" value="Create Video">
+        </form>
+    
+      </div>
     </div>
 {% endblock %}

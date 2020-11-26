@@ -2,6 +2,7 @@ import sqlite3
 from flask import Flask, render_template, request, url_for, flash, redirect, get_flashed_messages, request
 from flask_login import LoginManager, current_user, login_user, UserMixin, logout_user, login_required
 from passlib.hash import sha256_crypt
+import sys
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'akdfsj;fdkasjfa;dksfj'
@@ -211,8 +212,11 @@ def AppPage(appName):
 	+ " app.Name = video.HostingApp INNER JOIN season ON video.Season = season.SeasonID"
 	+ " INNER JOIN seasonshow ON season.ShowID = seasonshow.ShowID AND season.SeasonNumber = seasonshow.SeasonNumber"
 	+ " INNER JOIN shows ON seasonshow.ShowID = shows.ShowID WHERE app.Name ='" + appName + "'").fetchall()
+	videos = conn.execute("SELECT video.Title, video.VideoID"
+	+ " FROM app INNER JOIN video ON app.Name = video.HostingApp"
+	+ " WHERE video.Season == '' AND app.Name = '" + appName +"'").fetchall()
 	conn.close()
-	return render_template('page.html', app=app, platforms=platforms, shows=shows)	
+	return render_template('page.html', app=app, platforms=platforms, shows=shows, videos=videos)	
 
 @app.route('/freevideos')
 def freevideos():
@@ -344,7 +348,7 @@ def removevideo(videoid):
 	flash("Video removed from your MyList")
 	return redirect(url_for('mylist'))
 
-@app.route('/admin')
+@app.route('/admin', methods=['GET', 'POST'])
 def admin():
 	if not current_user.is_authenticated:
 		flash("You must be logged in to an admin account to access the admin panel")
@@ -352,7 +356,45 @@ def admin():
 
 	if current_user.is_admin == False:
 		flash("You are not an administrator")
-		print(current_user.is_admin)
 		return redirect(url_for('index'))
+	
+	if request.method == 'POST':
+		query = request.form['admin']
+		conn = get_db_connection()
+		try:
+			conn.execute(query)
+			flash("Query sent successfully")
+		except:
+			flash('Error, query unsuccessful: ' + str(sys.exc_info()[0]))
+		conn.close()
 	return render_template('admin.html')
 	
+@app.route('/recentmovies')
+def recentmovies():
+	conn = get_db_connection()
+	videos = conn.execute("SELECT video.Title AS title"
+		+ " FROM video"
+		+ " WHERE video.Season = ''"
+		+ " AND CAST(video.ReleaseDate as int > '2019')"
+		+ " AND video.Duration > '00:59:59';").fetchall()
+	conn.close()
+	return render_template('recentmovies.html', videos=videos)
+
+@app.route('<videoid>/watchvideo', methods=('POST',))
+def watchvideo(videoid):
+	if not current_user.is_authenticated:
+		flash("You must be logged in to watch a video")
+		return redirect('login')
+	conn = get_db_connection()
+	conn.execute("INSERT INTO watched (UserEmail, VideoID, isLiked) VALUES (?, ?, ?)",
+			(current_user.id, videoid, 0))
+	conn.close()
+	flash("Successfully liked video")
+
+@app.route('<videoid>/likevideo', methods=('POST',))
+def likevideo(videoid):
+	if not current_user.is_authenticated:
+		flash("You must be logged in to like a video")
+		return redirect('login')
+	conn=get_db_connection()
+	conn.execute("")
