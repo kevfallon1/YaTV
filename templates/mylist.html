@@ -3,6 +3,7 @@
 {% block content %}
     <div class="jumbotron">
       <h5 class="display-4">Shows on your MyList</h5>
+      {% if showlist %}
       {% for show in showlist %}
         <a href="{{ url_for('showpage', showID=show['ShowID']) }}">
             <h2 style="color:#9932CC;">{{ show['Title'] }}</h2>
@@ -15,9 +16,13 @@
             </form>
         <hr>
     {% endfor %}
+    {% else %}
+        <h3 style="font-style:italic">You do not have any shows on your list</h3>
+    {% endif %}
         </div>
     <div class="jumbotron">
     <h5 class="display-4">Videos on your MyList</h5>
+    {% if videolist %}
       {% for video in videolist %}
         <a href="{{ url_for('videopage', videoID=video['VideoID']) }}">
             <h2 style="color:#9932CC;">{{ video['Title'] }}</h2>
@@ -30,5 +35,8 @@
             </form>
         <hr>
     {% endfor %}
+    {% else %}
+        <h3 style="font-style:italic">You do not have any videos on your list</h3>
+    {% endif %}
     </div>
 {% endblock %}

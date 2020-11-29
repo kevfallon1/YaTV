@@ -3,6 +3,7 @@
 {% block content %}
     <div class="jumbotron">
       <h5 class="display-4">Apps you are subscribed to</h5>
+      {% if applist %}
       {% for app in applist %}
         <a style="color:#9932CC;" href="{{ url_for('AppPage', appName=app['Name']) }}">
             <h2>{{ app['Name'] }}</h2>
@@ -15,5 +16,8 @@
             </form>
         <hr>
     {% endfor %}
+    {% else %}
+        <h3 style="font-style:italic">You are not subscibed to any apps</h3>
+    {% endif %}
     </div>
 {% endblock %}

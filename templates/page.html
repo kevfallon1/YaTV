@@ -6,14 +6,18 @@
     <img src="/static/images/{{ app['Name'].replace(' ', '').lower() }}.png" class='img-fluid max-width:25% img-thumbnail' alt="Logo" >
     <p class="lead">{{ app['Description'] }}</p>
     <hr class="my-4">
-    <h1 class="display-4">Shows offered on {{ app['Name'] }}</h1>
-    <p>
-      {% for show in shows %}
-            <a style="color:#9932CC;" href="{{ url_for('showpage', showID=show['ShowID']) }}">
-                <h2>{{ show['Title'] }}</h2>
-            </a>
-    {% endfor %}
-    </p>
+    {% if shows %}
+      <h1 class="display-4">Shows offered on {{ app['Name'] }}</h1>
+      <p>
+        {% for show in shows %}
+              <a style="color:#9932CC;" href="{{ url_for('showpage', showID=show['ShowID']) }}">
+                  <h2>{{ show['Title'] }}</h2>
+              </a>
+      {% endfor %}
+      </p>
+      {% endif %}
+    
+    {% if videos %}
     <h1 class="display-4">Videos offered on {{ app['Name'] }}</h1>
     <p>
       {% for video in videos %}
@@ -21,6 +25,7 @@
                 <h2>{{ video['Title'] }}</h2>
             </a>
     {% endfor %}
+    {% endif %}
     </p>
     <p class="lead">
       <form action="{{ url_for('subscribe', appName=app['Name']) }}" method="POST">
