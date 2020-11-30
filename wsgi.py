@@ -1,4 +1,3 @@
-from yatv import app
+from yatv import getApp
 
-if __name__ = "__yatv__":
-	app.run()
+app = getApp()
