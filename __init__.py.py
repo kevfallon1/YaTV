@@ -7,8 +7,6 @@ import sys
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'akdfsj;fdkasjfa;dksfj'
 login = LoginManager(app)
-def getApp():
-    return app
 
 class User(UserMixin):
 	def __init__(self, fname, lname, id, password, country, is_admin):

@@ -2,13 +2,13 @@ import sqlite3
 from flask import Flask, render_template, request, url_for, flash, redirect, get_flashed_messages, request
 from flask_login import LoginManager, current_user, login_user, UserMixin, logout_user, login_required
 from passlib.hash import sha256_crypt
-import sys
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'akdfsj;fdkasjfa;dksfj'
 login = LoginManager(app)
-def getApp():
-    return app
+
+#user = "ericweiss@gmail.com"
+
 
 class User(UserMixin):
 	def __init__(self, fname, lname, id, password, country, is_admin):
@@ -85,7 +85,7 @@ def mylist():
 	showlist = conn.execute("SELECT shows.Title, shows.Description, shows.ShowID FROM user INNER JOIN showlist ON user.Email = "
 							+ "showlist.UserEmail INNER JOIN shows ON showlist.ShowID = shows.ShowID WHERE user.Email='"
 							+ useremail + "'ORDER BY shows.Title").fetchall()
-	videolist = conn.execute("SELECT video.Title, video.Description, video.VideoID FROM user INNER JOIN videolist ON user.Email = "
+	videolist = conn.execute("SELECT video.Title, video.Description FROM user INNER JOIN videolist ON user.Email = "
 							+ "videolist.UserEmail INNER JOIN video ON videolist.VideoID = video.VideoID WHERE user.Email='"
 							+ useremail + "'ORDER BY video.Title").fetchall()
 	conn.close()
@@ -94,7 +94,7 @@ def mylist():
 @app.route('/mostwatched')
 def mostwatched():
 	conn = get_db_connection()
-	showlist = conn.execute("SELECT shows.Title AS Top10Shows, shows.ShowID, app.Name AS App"
+	showlist = conn.execute("SELECT shows.Title AS Top10Shows, app.Name AS App"
 							+ " FROM app INNER JOIN video ON video.HostingApp = app.Name"
 							+ " INNER JOIN season ON season.SeasonID = video.Season"
 							+ " INNER JOIN seasonshow ON season.ShowID = seasonshow.ShowID"
@@ -182,8 +182,8 @@ def subscribe(appName):
 	if current:
 		flash("You are already subscribed to " + appName)
 		return redirect(url_for('index'))
-	conn.execute('INSERT INTO appsubscription (UserEmail, AppName, Expiration, Cost) VALUES (?, ?, ?, ?)',
-				(current_user.id, appName, 2021-11-20 ,10))
+	conn.execute('INSERT INTO appsubscription (UserEmail, AppName) VALUES (?, ?)',
+				(current_user.id, appName))
 	conn.commit()
 	conn.close()
 
@@ -196,8 +196,8 @@ def unsubscribe(appName):
 		flash("You must be logged in to unsubscribe from an app.")
 		return redirect(url_for('login'))
 	conn = get_db_connection()
-	conn.execute('DELETE FROM appsubscription WHERE AppName = ? AND UserEmail = ?',
-				(appName, current_user.id))
+	conn.execute('DELETE FROM appsubscription WHERE AppName = ?',
+				(appName,))
 	conn.commit()
 	conn.close()
 
@@ -214,11 +214,8 @@ def AppPage(appName):
 	+ " app.Name = video.HostingApp INNER JOIN season ON video.Season = season.SeasonID"
 	+ " INNER JOIN seasonshow ON season.ShowID = seasonshow.ShowID AND season.SeasonNumber = seasonshow.SeasonNumber"
 	+ " INNER JOIN shows ON seasonshow.ShowID = shows.ShowID WHERE app.Name ='" + appName + "'").fetchall()
-	videos = conn.execute("SELECT video.Title, video.VideoID"
-	+ " FROM app INNER JOIN video ON app.Name = video.HostingApp"
-	+ " WHERE video.Season == '' AND app.Name = '" + appName +"'").fetchall()
 	conn.close()
-	return render_template('page.html', app=app, platforms=platforms, shows=shows, videos=videos)	
+	return render_template('page.html', app=app, platforms=platforms, shows=shows)	
 
 @app.route('/freevideos')
 def freevideos():
@@ -242,19 +239,16 @@ def showpage(showID):
 			+ " ON season.ShowID = seasonshow.ShowID AND"
     		+ " season.SeasonNumber = seasonshow.SeasonNumber"
     		+ " INNER JOIN shows ON seasonshow.ShowID = shows.ShowID ORDER BY season.SeasonNumber").fetchall()
-	seasonvideos = conn.execute("SELECT video.Title as videotitle, video.Description as videodescription, video.VideoID as videoid,"
+	seasonvideos = conn.execute("SELECT video.Title as videotitle, video.Description as videodescription, "
 			+ " season.SeasonNumber as seasonnumber, shows.ShowID as showid FROM video INNER JOIN season ON video.Season = season.SeasonID"
 			+ " INNER JOIN seasonshow ON season.ShowID = seasonshow.ShowID AND season.SeasonNumber = seasonshow.SeasonNumber"
         	+ " INNER JOIN shows ON seasonshow.ShowID = shows.ShowID").fetchall()
 	conn.close()
 	return render_template('showpage.html', show=show, seasons=seasons, seasonvideos=seasonvideos) 
 
-@app.route('/<videoID>/videopage')
-def videopage(videoID):
-	conn = get_db_connection()
-	video = conn.execute("SELECT * FROM video WHERE video.VideoID = '" + videoID + "'").fetchone()
-	conn.close()
-	return render_template('videopage.html', video=video)
+@app.route('/<videoname>/videopage')
+def videopage(videoName):
+	return
 
 @app.route('/populartags')
 def populartags():
@@ -268,11 +262,27 @@ def populartags():
 	conn.close()
 	return render_template('populartags.html', tags=tags)
 
+@app.route('/revenuereport')
+def revenuereport():
+
+	conn = get_db_connection()
+	countries = conn.execute("SELECT DISTINCT user.Country FROM user ORDER BY user.Country").fetchall()
+	revenue = {}
+	for country in countries:
+		revenue[country['Country']] = conn.execute("SELECT app.Name as name, IFNULL(SUM(appsubscription.Cost),0) as revenue"
+			+ " FROM app INNER JOIN appsubscription ON app.Name = appsubscription.AppName"
+			+ " INNER JOIN user ON appsubscription.UserEmail = user.Email"
+			+ " WHERE user.Country LIKE '%" + country['Country'] + "%'"
+			+ " GROUP BY app.Name"
+			+ " ORDER BY SUM(appsubscription.Cost) DESC").fetchall()
+	conn.close()
+	return render_template('revenuereport.html',revenue=revenue, countries=countries)
+
 @app.route('/<showid>/addshow', methods=('POST',))
 def addshow(showid):
 	if not current_user.is_authenticated:
 		flash("You must be logged in to add a show to your MyList")
-		return redirect(url_for('login'))
+		return redirect('login')
 	conn = get_db_connection()
 	current = conn.execute("SELECT Shows.ShowID, Shows.Title, User.Email"
 			+ " FROM user INNER JOIN showlist ON user.Email = showlist.UserEmail"
@@ -300,39 +310,7 @@ def removeshow(showid):
 	flash("Show removed from your MyList")
 	return redirect(url_for('mylist'))
 
-@app.route('/<videoid>/addvideo', methods=('POST',))
-def addvideo(videoid):
-	if not current_user.is_authenticated:
-		flash("You must be logged in to add a video to your MyList")
-		return redirect(url_for('login'))
-	conn = get_db_connection()
-	current = conn.execute("SELECT video.VideoID, video.Title, User.Email"
-			+ " FROM user INNER JOIN videolist ON user.Email = videolist.UserEmail"
-			+ " INNER JOIN video on videolist.VideoID = video.VideoID"
-			+ " WHERE videolist.UserEmail = '" + current_user.id + "'AND video.VideoID = '" + videoid + "'").fetchone()
-	if current:
-		flash(current['Title'] + " is already on your MyList")
-		return redirect(url_for('index'))
-	conn.execute('INSERT INTO videolist (UserEmail, VideoID) VALUES (?, ?)',
-				(current_user.id, videoid))
-	conn.commit()
-	conn.close()
-
-	flash("Video successfully added to your MyList")
-	return redirect(url_for('mylist'))
-
-@app.route('/<videoid>/removevideo', methods=('POST',))
-def removevideo(videoid):
-	conn = get_db_connection()
-	conn.execute('DELETE FROM videolist WHERE VideoID = ? AND UserEmail = ?',
-				(videoid, current_user.id))
-	conn.commit()
-	conn.close()
-
-	flash("Video removed from your MyList")
-	return redirect(url_for('mylist'))
-
-@app.route('/admin', methods=['GET', 'POST'])
+@app.route('/admin')
 def admin():
 	if not current_user.is_authenticated:
 		flash("You must be logged in to an admin account to access the admin panel")
@@ -340,120 +318,7 @@ def admin():
 
 	if current_user.is_admin == False:
 		flash("You are not an administrator")
+		print(current_user.is_admin)
 		return redirect(url_for('index'))
+	return render_template('admin.html')
 	
-	conn = get_db_connection()
-	apps = conn.execute("SELECT appplatform.AppName, appplatform.PlatformID, appplatform.Version"
-				+ " FROM appplatform").fetchall()
-
-	videos = conn.execute("SELECT * FROM video").fetchall()
-	if request.method == 'POST':
-		if request.form['btn'] == 'Submit Query':
-			query = request.form['admin']
-			try:
-				conn.execute(query)
-				flash("Query sent successfully")
-			except:
-				flash('Error, query unsuccessful: ' + str(sys.exc_info()[0]))
-		elif request.form['btn'] == 'Update':
-			appname = request.form['appname']
-			platformid = request.form['platformid']
-			newversion = request.form['newversion']
-			try:
-				conn.execute("UPDATE appplatform"
-					+ " SET Version = ?"
-					+ " WHERE AppName = ? AND PlatformID = ?",
-					(newversion, appname, platformid))
-				conn.commit()
-				conn.close()
-				flash("Platform updated")
-				return redirect(url_for('admin'))
-			except:
-				flash("Error: Platform update failed")
-		elif request.form['btn'] == 'Create Video':
-			videoid = request.form['videoid']
-			title = request.form['title']
-			description = request.form['description']
-			releasedate = request.form['releasedate']
-			duration = request.form['duration']
-			isfree = request.form['isfree']
-			hostingapp = request.form['hostingapp']
-			season = request.form['season']
-			try:
-				conn.execute("INSERT INTO video (VideoID, Title, Description, ReleaseDate, Duration, "
-						+ "isFree, HostingApp, Season) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-						(videoid, title, description, releasedate, duration, isfree, hostingapp, season))
-				conn.commit()
-				conn.close()
-				flash("Video added")
-				return redirect(url_for('admin'))
-			except:
-				flash("Error: Video not added")
-		else:
-			flash("ERROR")
-	
-	countries = conn.execute("SELECT DISTINCT user.Country FROM user ORDER BY user.Country").fetchall()
-	revenue = {}
-	for country in countries:
-		revenue[country['Country']] = conn.execute("SELECT appsubscription.AppName as name, IFNULL(SUM(appsubscription.Cost),0) as revenue"
-			+ " FROM appsubscription"
-			+ " INNER JOIN user ON appsubscription.UserEmail = user.Email"
-			+ " WHERE user.Country LIKE '%" + country['Country'] + "%'"
-			+ " GROUP BY appsubscription.AppName"
-			+ " ORDER BY SUM(appsubscription.Cost) DESC").fetchall()
-
-	
-	conn.close()
-	return render_template('admin.html', apps=apps, videos=videos, countries = countries, revenue=revenue)
-	
-@app.route('/recentmovies')
-def recentmovies():
-	conn = get_db_connection()
-	videos = conn.execute("SELECT video.Title AS title, video.VideoID as id"
-		+ " FROM video"
-		+ " WHERE video.Season = ''"
-		+ " AND CAST(video.ReleaseDate as int) > '2019'"
-		+ " AND video.Duration > '00:59:59';").fetchall()
-	conn.close()
-	return render_template('recentmovies.html', videos=videos)
-
-@app.route('/<videoid>/watchvideo', methods=('POST',))
-def watchvideo(videoid):
-	if not current_user.is_authenticated:
-		flash("You must be logged in to watch a video")
-		return redirect(url_for('login'))
-	conn = get_db_connection()
-	current = conn.execute("SELECT watched.UserEmail, watched.VideoID FROM watched WHERE watched.UserEmail LIKE '" + current_user.id + "'" 
-			+ " AND watched.VideoID LIKE '" + videoid + "'").fetchone()
-	if current:
-		flash("You have already watched this video")
-		return redirect(url_for('videopage', videoID=videoid))
-
-	conn.execute("INSERT INTO watched (UserEmail, VideoID, isLiked) VALUES (?, ?, ?)",
-			(current_user.id, videoid, 0))
-	conn.commit()
-	conn.close()
-	flash("Successfully watched video")
-	return redirect(url_for('videopage', videoID=videoid))
-
-@app.route('/<videoid>/likevideo', methods=('POST',))
-def likevideo(videoid):
-	if not current_user.is_authenticated:
-		flash("You must be logged in to like a video")
-		return redirect(url_for('login'))
-	conn = get_db_connection()
-	current = conn.execute("SELECT * FROM watched WHERE watched.UserEmail LIKE '" + current_user.id + "'" 
-			+ " AND watched.VideoID LIKE '" + videoid + "'").fetchone()
-	if current:
-		if current['isLiked'] == 1:
-			flash("You have already liked this video")
-			return redirect(url_for('videopage', videoID=videoid))
-		conn.execute("UPDATE watched SET isLiked = 1 WHERE watched.UserEmail = ?  AND watched.VideoID = ?", 
-				(current_user.id, videoid))
-		conn.commit()
-		conn.close()
-		flash("Liked video")
-		return redirect(url_for('videopage', videoID=videoid))
-	
-	flash("You must watch this video before you like it")
-	return redirect(url_for('videopage', videoID=videoid))
