@@ -288,7 +288,6 @@ def populartags():
 			+ " FROM (tags INNER JOIN video ON tags.VideoID = video.VideoID)"
 			+ " INNER JOIN watched ON watched.VideoID = video.VideoID"
 			+ " GROUP BY tags.Tag"
-			+ " ORDER BY COUNT(watched.UserEmail) DESC"
 			+ " ORDER BY COUNT(watched.Useremail) DESC"
 			+ " LIMIT 3;").fetchall()
 	conn.close()
