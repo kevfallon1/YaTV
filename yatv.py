@@ -284,11 +284,11 @@ def videopage(videoID):
 @app.route('/populartags')
 def populartags():
 	conn = get_db_connection()
-	tags = conn.execute("SELECT DISTINCT tags.Tag AS top3, COUNT(DISTINCT watched.VideoID) AS numwatched"
+	tags = conn.execute("SELECT DISTINCT tags.Tag AS top3, COUNT(watched.UserEmail) AS numwatched"
 			+ " FROM (tags INNER JOIN video ON tags.VideoID = video.VideoID)"
 			+ " INNER JOIN watched ON watched.VideoID = video.VideoID"
 			+ " GROUP BY tags.Tag"
-			+ " ORDER BY COUNT(watched.VideoID)"
+			+ " ORDER BY COUNT(watched.UserEmail) DESC"
 			+ " LIMIT 3;").fetchall()
 	conn.close()
 	return render_template('populartags.html', tags=tags)
