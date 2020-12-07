@@ -18,7 +18,12 @@
         Duration: {{ video['Duration'] }}
     </p>
     <p class="lead">
-        Free? {{ video['isFree'] }}
+        Free?: 
+        {% if video['isFree'] == '1' %}
+            Yes
+        {% else %}
+            No
+        {% endif %}        
     </p>
     <p class="lead">
         Hosting App: {{ video['HostingApp'] }}
