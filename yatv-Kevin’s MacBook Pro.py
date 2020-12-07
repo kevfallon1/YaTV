@@ -217,7 +217,6 @@ def AppPage(appName):
 	videos = conn.execute("SELECT video.Title, video.VideoID"
 	+ " FROM app INNER JOIN video ON app.Name = video.HostingApp"
 	+ " WHERE video.Season == '' AND app.Name = '" + appName +"'").fetchall()
-	
 	conn.close()
 	return render_template('page.html', app=app, platforms=platforms, shows=shows, videos=videos)	
 
@@ -247,32 +246,8 @@ def showpage(showID):
 			+ " season.SeasonNumber as seasonnumber, shows.ShowID as showid FROM video INNER JOIN season ON video.Season = season.SeasonID"
 			+ " INNER JOIN seasonshow ON season.ShowID = seasonshow.ShowID AND season.SeasonNumber = seasonshow.SeasonNumber"
         	+ " INNER JOIN shows ON seasonshow.ShowID = shows.ShowID").fetchall()
-	"""
-	Utilizes user parametization by allowing the user to navigate to a show's page. This query will then return the show and it's number of episdoes
-	unless the show has 0 episodes, in which case nothing will be returned. This will be incorporated as a feature for the user to track
-	how many episodes a show has.
-	"""
-	episodes = conn.execute("SELECT COUNT(video.VideoID) as episodecount FROM"
-			+ " shows INNER JOIN seasonshow on shows.ShowID = seasonshow.ShowID"
-    		+ " INNER JOIN season on seasonshow.ShowID = season.ShowID AND seasonshow.SeasonNumber = season.SeasonNumber"
-        	+ " INNER JOIN video ON video.Season = season.SeasonID"
-			+ " WHERE shows.ShowID LIKE '" + showID + "'"
-			+ " GROUP BY shows.title HAVING COUNT(video.VideoID) > 0"
-			+ " ORDER BY shows.Title, COUNT(video.VideoID) ASC").fetchone()
-	
-	"""
-	Utilizes user parametization by allowing a user to determine how many seasons that a show has. If a show
-	has greater than 0 seasons, the show will be returned with a count of its number of seasons.
-	"""
-	seasoncount = conn.execute("SELECT shows.Title, COUNT(DISTINCT season.SeasonID) as seasoncount"
-			+ " FROM shows INNER JOIN seasonshow on shows.ShowID = seasonshow.ShowID"
-    		+ " INNER JOIN season on seasonshow.ShowID = season.ShowID AND seasonshow.SeasonNumber = season.SeasonNumber"
-        	+ " INNER JOIN video ON video.Season = season.SeasonID"
-			+ " WHERE shows.ShowID LIKE '" + showID + "'"
-			+ " GROUP BY shows.title HAVING COUNT(season.seasonID) > 0"
-			+ " ORDER BY shows.Title, COUNT(season.seasonID) ASC").fetchone()
 	conn.close()
-	return render_template('showpage.html', show=show, seasons=seasons, seasonvideos=seasonvideos, episodes=episodes, seasoncount=seasoncount) 
+	return render_template('showpage.html', show=show, seasons=seasons, seasonvideos=seasonvideos) 
 
 @app.route('/<videoID>/videopage')
 def videopage(videoID):
@@ -284,7 +259,7 @@ def videopage(videoID):
 @app.route('/populartags')
 def populartags():
 	conn = get_db_connection()
-	tags = conn.execute("SELECT DISTINCT tags.Tag AS top3, COUNT(DISTINCT watched.VideoID) AS numwatched"
+	tags = conn.execute("SELECT DISTINCT tags.Tag AS top3, COUNT(watched.UserEmail) AS numwatched"
 			+ " FROM (tags INNER JOIN video ON tags.VideoID = video.VideoID)"
 			+ " INNER JOIN watched ON watched.VideoID = video.VideoID"
 			+ " GROUP BY tags.Tag"
@@ -482,39 +457,3 @@ def likevideo(videoid):
 	
 	flash("You must watch this video before you like it")
 	return redirect(url_for('videopage', videoID=videoid))
-
-@app.route('/reports')
-def reports():
-	if not current_user.is_authenticated:
-		flash("You must be logged in to access reports")
-		return redirect(url_for('login'))
-	conn = get_db_connection()
-
-	"""
-	As a growing international business, it is important for us to keep track of how many countries around the world 
-	utilize mobile platforms. As we focus on mobile platforms specifically, we look to use this query to track this data.
-	"""
-	mobilecountries = conn.execute("SELECT User.Country FROM"
-			+ " user INNER JOIN appsubscription ON user.Email = appsubscription.UserEmail"
-    		+ " INNER JOIN appplatform ON appsubscription.AppName = appplatform.AppName"
-        	+ " INNER JOIN platform ON appplatform.PlatformID = platform.PlatformID"
-			+ " WHERE platform.isMobile LIKE 1 GROUP BY User.Country"
-			+ " Having COUNT(platform.PlatformID) > 0 ORDER BY"
-			+ " User.Country, COUNT(platform.PlatformID) ASC").fetchall()
-
-	unwatched = conn.execute("SELECT v.VideoID, v.Title AS VideoTitle FROM videolist vl"
-			+ " LEFT JOIN user u ON u.Email = vl.UserEmail"
-			+ " INNER JOIN video v ON v.VideoID = vl.VideoID WHERE u.Email = '" + current_user.id +  "'"
-			+ " EXCEPT SELECT w.VideoID AS vID, v.Title AS VideoTitle"
-			+ " FROM watched w LEFT JOIN user u ON w.UserEmail = u.Email"
-			+ " INNER JOIN video v ON v.VideoID = w.VideoID WHERE u.Email = '" + current_user.id + "'"
-			+ " ORDER BY VideoTitle").fetchall()
-	conn.close()
-	return render_template('reports.html', mobilecountries=mobilecountries, unwatched=unwatched)
-	
-	
-
-	
-	
-
-

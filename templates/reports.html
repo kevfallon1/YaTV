@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="jumbotron">
+      <h5 class="display-4">Unwatched videos on your MyList</h5>
+      {% if unwatched %}
+      {% for video in unwatched %}
+        <a style="color:#9932CC;" href="{{ url_for('videopage', videoID=video['VideoID']) }}">
+            <h2>{{ video['VideoTitle'] }}</h2>
+        </a>
+    {% endfor %}
+    {% else %}
+        <h3 style="font-style:italic">You have no unwatched videos on your MyList</h3>
+    {% endif %}
+    </div>
+
+    <div class="jumbotron">
+        <h5 class="display-4">Countries where mobile is supported</h5>
+        {% if mobilecountries %}
+        {% for country in mobilecountries %}
+          <a style="color:#9932CC;">
+              <h2>{{ country['Country'] }}</h2>
+          </a>
+      {% endfor %}
+      {% else %}
+          <h3 style="font-style:italic">No countries are currently offering mobile support</h3>
+      {% endif %}
+      </div>
+{% endblock %}
