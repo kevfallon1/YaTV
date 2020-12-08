@@ -37,10 +37,11 @@ def load_user(id):
 	login = conn.execute("SELECT * FROM user WHERE user.Email='" + id + "'").fetchone()
 	conn.close()
 	isAdmin = False
-	if login['Email'] == "admin@yatv.com":
-		isAdmin = True
 	if not login:
 		return 
+	if login['Email'] == "admin@yatv.com":
+		isAdmin = True
+	
 	return User(login['FName'], login['LName'], login['Email'], login['Password'], login['Country'], isAdmin)
 	
 def get_db_connection():
@@ -452,7 +453,6 @@ def watchvideo(videoid):
 			+ " AND watched.VideoID LIKE '" + videoid + "'").fetchone()
 	appsubscription = conn.execute("SELECT * FROM appsubscription INNER JOIN video ON appsubscription.AppName = video.HostingApp"
 			+ " WHERE appsubscription.UserEmail LIKE '" + current_user.id + "' AND video.VideoID LIKE '" + videoid + "'").fetchone()
-	
 	video = conn.execute("SELECT * FROM video WHERE video.VideoID LIKE '" + videoid + "'").fetchone()
 	if not appsubscription:
 		flash("You must be subscribed to " + video["HostingApp"])
