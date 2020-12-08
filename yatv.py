@@ -450,6 +450,13 @@ def watchvideo(videoid):
 	conn = get_db_connection()
 	current = conn.execute("SELECT watched.UserEmail, watched.VideoID FROM watched WHERE watched.UserEmail LIKE '" + current_user.id + "'" 
 			+ " AND watched.VideoID LIKE '" + videoid + "'").fetchone()
+	appsubscription = conn.execute("SELECT * FROM appsubscription INNER JOIN video ON appsubscription.AppName = video.HostingApp"
+			+ " WHERE appsubscription.UserEmail LIKE '" + current_user.id + "' AND video.VideoID LIKE '" + videoid + "'").fetchone()
+	
+	video = conn.execute("SELECT * FROM video WHERE video.VideoID LIKE '" + videoid + "'").fetchone()
+	if not appsubscription:
+		flash("You must be subscribed to " + video["HostingApp"])
+		return redirect(url_for('videopage', videoID=videoid))
 	if current:
 		flash("You have already watched this video")
 		return redirect(url_for('videopage', videoID=videoid))
