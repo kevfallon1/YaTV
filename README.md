@@ -1,4 +1,18 @@
 # YaTV
+
+Installation video: https://youtu.be/UHB_Z0kHEek
+Task/Report demonstration video: https://youtu.be/JZ0ItF-N3co
+
+Required Installations:
+- Python
+- Flask
+- Flask_Login
+- Passlib
+
+To run this web app in a VM, navigate to the YaTV directory, and execute the following commands:
+- export FLASK_APP=yatv.py
+- flask run
+
 Yet another TV app. Access all your streaming platforms, along with their associated shows and videos in one location
 
 Users in the system have a first and last name, an identifying email address, their password, and their country. Because YaTV.app is really “Yet Another TV app” users are an integral part of the data we collect. Users interact with videos by being able to search and watch them, liking any of the videos they have watched, and can even create a “My List” which is composed of all videos and/or shows they would like to come back to later. We are keeping track of the videos that a user watches via the "Watched" table, and are assuming that a user can only like a video if they have watched it. We do however, keep track of every video that a user likes. Additionally, we can derive every video or show that they've added to their "MyList" via the Videolist and Showlist tables. The YaTV.app does need to be profitable, so we track users’ subscriptions to apps, specifically the expiration and cost of these subscriptions so we can take our cut. 
