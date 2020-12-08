@@ -518,7 +518,7 @@ def reports():
 			+ " ORDER BY VideoTitle").fetchall()
 	
 	efficiency = conn.execute("SELECT videosWatched, ('$' || Cost) AS subscriptionsCost,"
-			+ " PRINTF('%.2f', CAST(videosWatched AS FLOAT) / Cost) AS CostEfficiency"
+			+ " PRINTF('%.2f', Cost / CAST(videosWatched AS FLOAT)) AS CostEfficiency"
 			+ " FROM(SELECT (COUNT(w.VideoID) / COUNT(DISTINCT asub.AppName)) AS videosWatched,"
         	+ " (asub.Cost * COUNT(DISTINCT asub.AppName)) AS Cost"
     		+ " FROM appsubscription asub INNER JOIN user u ON asub.UserEmail = u.Email"
