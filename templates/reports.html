@@ -15,6 +15,24 @@
     </div>
 
     <div class="jumbotron">
+        <h5 class="display-4">Cost Efficiency</h5>
+        {% if efficiency %}
+          <a style="color:#9932CC;">
+              <h2>${{ efficiency['CostEfficiency'] }} per video</h2>
+          </a>
+
+          <a>
+              <h5>{{ efficiency['videosWatched'] }} video's watched, 
+                 {{ efficiency['subscriptionsCost'] }} paid in subscriptions
+              </h5>
+          </a>
+      {% else %}
+          <h3 style="font-style:italic">You have not watched enough paid videos to determine efficiency</h3>
+      {% endif %}
+      </div>
+  
+
+    <div class="jumbotron">
         <h5 class="display-4">Countries where mobile is supported</h5>
         {% if mobilecountries %}
         {% for country in mobilecountries %}

@@ -516,8 +516,16 @@ def reports():
 			+ " FROM watched w LEFT JOIN user u ON w.UserEmail = u.Email"
 			+ " INNER JOIN video v ON v.VideoID = w.VideoID WHERE u.Email = '" + current_user.id + "'"
 			+ " ORDER BY VideoTitle").fetchall()
+	
+	efficiency = conn.execute("SELECT videosWatched, ('$' || Cost) AS subscriptionsCost,"
+			+ " PRINTF('%.2f', CAST(videosWatched AS FLOAT) / Cost) AS CostEfficiency"
+			+ " FROM(SELECT (COUNT(w.VideoID) / COUNT(DISTINCT asub.AppName)) AS videosWatched,"
+        	+ " (asub.Cost * COUNT(DISTINCT asub.AppName)) AS Cost"
+    		+ " FROM appsubscription asub INNER JOIN user u ON asub.UserEmail = u.Email"
+        	+ " INNER JOIN watched w ON u.Email = w.UserEmail WHERE u.Email = '" + current_user.id + "' GROUP BY u.Email"
+    		+ " HAVING videosWatched > 0)").fetchone()
 	conn.close()
-	return render_template('reports.html', mobilecountries=mobilecountries, unwatched=unwatched)
+	return render_template('reports.html', mobilecountries=mobilecountries, unwatched=unwatched, efficiency=efficiency)
 	
 	
 
