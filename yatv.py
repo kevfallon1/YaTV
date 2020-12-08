@@ -461,7 +461,7 @@ def watchvideo(videoid):
 	appsubscription = conn.execute("SELECT * FROM appsubscription INNER JOIN video ON appsubscription.AppName = video.HostingApp"
 			+ " WHERE appsubscription.UserEmail LIKE '" + current_user.id + "' AND video.VideoID LIKE '" + videoid + "'").fetchone()
 	video = conn.execute("SELECT * FROM video WHERE video.VideoID LIKE '" + videoid + "'").fetchone()
-	if not appsubscription:
+	if not appsubscription and video['isFree'] == '0':
 		flash("You must be subscribed to " + video["HostingApp"])
 		return redirect(url_for('videopage', videoID=videoid))
 	if current:
