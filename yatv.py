@@ -249,9 +249,12 @@ def showpage(showID):
 			+ " INNER JOIN seasonshow ON season.ShowID = seasonshow.ShowID AND season.SeasonNumber = seasonshow.SeasonNumber"
         	+ " INNER JOIN shows ON seasonshow.ShowID = shows.ShowID").fetchall()
 	"""
-	Utilizes user parametization by allowing the user to navigate to a show's page. This query will then return the show and it's number of episdoes
-	unless the show has 0 episodes, in which case nothing will be returned. This will be incorporated as a feature for the user to track
-	how many episodes a show has.
+	--Utilizes user parametization by allowing the user to input a show title. This query will then return the show and it's number of episdoes
+	-- unless the show has 0 episodes, in which case nothing will be returned. This will be incorporated as a feature for the user to track
+	-- how many episodes a show has.
+	--This is a complex query because it has 3 inner joins (1 point), an aggregate function (1 point), a grouping (1 point),
+	-- an ordering with two fields (1 point), a where condition and a having condition both not for joins (1 point) and a strong justification.
+	-- This is a strong justification because this is a useful feature that will likely be implemented at a later stage.
 	"""
 	episodes = conn.execute("SELECT COUNT(video.VideoID) as episodecount FROM"
 			+ " shows INNER JOIN seasonshow on shows.ShowID = seasonshow.ShowID"
@@ -262,8 +265,12 @@ def showpage(showID):
 			+ " ORDER BY shows.Title, COUNT(video.VideoID) ASC").fetchone()
 	
 	"""
-	Utilizes user parametization by allowing a user to determine how many seasons that a show has. If a show
-	has greater than 0 seasons, the show will be returned with a count of its number of seasons.
+	--Utilizes user parametization by allowing a user to determine how many seasons that a show has. If a show
+	-- has greater than 0 seasons, the show will be returned with a count of its number of seasons. This will be
+	-- incorporated as a feature that lets a user determine how many seasons a show has. 
+	--This is a complex query because it has 3 inner joins (1 point), an aggregate function (1 point), a grouping (1 point),
+	-- an ordering with two fields (1 point), a where condition and a having condition both not for joins (1 point) and a strong justification.
+	-- This is a strong justification because this is a useful feature that will likely be implemented at a later stage.
 	"""
 	seasoncount = conn.execute("SELECT shows.Title, COUNT(DISTINCT season.SeasonID) as seasoncount"
 			+ " FROM shows INNER JOIN seasonshow on shows.ShowID = seasonshow.ShowID"
@@ -498,8 +505,11 @@ def reports():
 	conn = get_db_connection()
 
 	"""
-	As a growing international business, it is important for us to keep track of how many countries around the world 
-	utilize mobile platforms. As we focus on mobile platforms specifically, we look to use this query to track this data.
+	-- As a growing international business, it is important for us to keep track of how many countries around the world 
+	-- utilize mobile platforms. As we focus on mobile platforms specifically, we look to use this query to track this data.
+	-- This is a complex query because it has 3 inner joins (1 point), an aggregate function (1 point), a grouping (1 point),
+	-- an ordering with two fields (1 point), a where condition and a having condition both not for joins (1 point) and a strong justification.
+	-- This is a strong justification because this is a useful feature that will likely be implemented at a later stage.
 	"""
 	mobilecountries = conn.execute("SELECT User.Country FROM"
 			+ " user INNER JOIN appsubscription ON user.Email = appsubscription.UserEmail"
@@ -509,6 +519,14 @@ def reports():
 			+ " Having COUNT(platform.PlatformID) > 0 ORDER BY"
 			+ " User.Country, COUNT(platform.PlatformID) ASC").fetchall()
 
+	"""
+	---This query utilizes user parameterization by allowing the user to input their account email. By doing so, this query
+	---returns all videos the user has put into their MyList but has not wathced yet. 
+	---This is a great way for users to quickly see what shows they've been meaning to watch and will inately make them 
+	---spend more time on our app. The longer we have users on our platform, the more money we make. Our query justification:
+	---(3+ tables joined: 1 point), (Except: 1 point), (Order By 2+: 1 point), (Where/Having: 1 point), (Non-Inner Joins: 1 point),
+	---(Justification: 1 point)
+	"""
 	unwatched = conn.execute("SELECT v.VideoID, v.Title AS VideoTitle FROM videolist vl"
 			+ " LEFT JOIN user u ON u.Email = vl.UserEmail"
 			+ " INNER JOIN video v ON v.VideoID = vl.VideoID WHERE u.Email = '" + current_user.id +  "'"
@@ -517,6 +535,14 @@ def reports():
 			+ " INNER JOIN video v ON v.VideoID = w.VideoID WHERE u.Email = '" + current_user.id + "'"
 			+ " ORDER BY VideoTitle").fetchall()
 	
+	"""
+	---This query will allow a user to see how "Cost Effective" their subscriptions are. By finding the user's total cost in
+	---subscriptions for them, as well as how many total videos the user has watched, we are able to deliver how much 
+	---bang for their buck the user is really getting. A happy customer is a loyal one, and this feature will allow us to
+	---differentiate our offerings from competitors and appease our consumers, something exceptionally valuable for the company.
+	---Our justification: (Tables joined 3+: 1 point), (Aggregate functions: 1 point), (Non-Aggregate functions: 1 point),
+	---(Where/Having: 1 point), (Grouping: 1 point), (Justification: 1 point), (Subquery: 1 point)
+	"""
 	efficiency = conn.execute("SELECT videosWatched, ('$' || Cost) AS subscriptionsCost,"
 			+ " PRINTF('%.2f', Cost / CAST(videosWatched AS FLOAT)) AS CostEfficiency"
 			+ " FROM(SELECT (COUNT(w.VideoID) / COUNT(DISTINCT asub.AppName)) AS videosWatched,"
