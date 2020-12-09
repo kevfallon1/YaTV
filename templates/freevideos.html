@@ -3,15 +3,18 @@
 {% block content %}
     <div class="jumbotron">
       <h5 class="display-4">Free on YaTV</h5>
+        <form method="post">
+            <input type="text" id="freesearch" class="form-control" name="freesearch" placeholder="Enter platform"
+            value="{{ request.form['freesearch'] }}">
+            <input type="submit" class="btn btn-primary" value="Search">
+        </form>
+
+
+        <h2>{{ platform }}</h2>
       {% for video in videos %}
         <a style="color:#9932CC;" href="{{ url_for('videopage', videoID=video['id']) }}">
             <h2>{{ video['title'] }}</h2>
         </a>
-        {% for platform in platforms %}
-            {% if video['id'] == platform['id'] %}
-                <span class="badge badge-dark">{{ platform['name'] }}</span>
-                {% endif %}
-            {% endfor %}
         <hr>
     {% endfor %}
     </div>

@@ -10,6 +10,39 @@
         <input type="submit" class="btn btn-primary" name="btn" value="Submit Query">
       </form>
     </div>
+
+
+    <div class="jumbotron">
+      <h5 class="display-4">Revenue By Country</h5>
+        <form method="post">
+            <input type="text" id="revenue" class="form-control" name="revenue" placeholder="Enter Country"
+            value="{{ request.form['revenue'] }}">
+            <input type="submit" name="btn" class="btn btn-primary" value="Search">
+        </form>
+
+
+      <a style="color:#9932CC;" >
+          <h2>{{ revenueCountry }}</h2>
+          
+      </a>
+      <table class="table">
+          <thead>
+              <tr>
+                <th scope="col">App Name</th>
+                <th scope="col">Revenue</th>
+              </tr>
+            </thead>
+          <tbody>
+      {% for app in revenueapps %} 
+              <TR>
+                  <TD class="c1">{{ app['name'] }}</TD>
+                  <TD class="c2">${{ app['revenue'] }}</TD>
+              </TR>
+          {% endfor %}
+          </tbody>
+          </table>
+
+    </div>
     <div class="jumbotron">
       <div id="formContent">
         <h1 class="display-4">Update App Version</h1>
@@ -81,7 +114,8 @@
             <th scope="col">Duration</th>
             <th scope="col">Free?</th>
             <th scope="col">Hosting App</th>
-            <th scope="col">Season</th>
+            <th scope="col">SeasonID</th>
+            <th scope="col">SeasonNumber</th>
           </tr>
         </thead>
           <tbody>
@@ -95,40 +129,12 @@
               <TD class="c6">{{ video['isFree'] }}</TD>
               <TD class="c7">{{ video['HostingApp'] }}</TD>
               <TD class="c8">{{ video['Season'] }}</TD>
+              <TD class="c8">{{ video['SeasonNumber'] }}</TD>
             </TR>
             {% endfor %}
           </tbody>
         </table>
     </div>
-
-    <div class="jumbotron">
-      <h5 class="display-4">Revenue Report</h5>
-      {% for country in countries %}
-          {% if revenue[country['Country']] %}
-              
-              <a style="color:#9932CC;" >
-                  <h2>{{ country['Country'] }}</h2>
-                  
-              </a>
-              <table class="table">
-                  <thead>
-                      <tr>
-                        <th scope="col">App Name</th>
-                        <th scope="col">Revenue</th>
-                      </tr>
-                    </thead>
-                  <tbody>
-              {% for app in revenue[country['Country']] %} 
-                      <TR>
-                          <TD class="c1">{{ app['name'] }}</TD>
-                          <TD class="c2">${{ app['revenue'] }}</TD>
-                      </TR>
-                  {% endfor %}
-                  </tbody>
-                  </table>
-                  {% endif %}
-              {% endfor %}
-              </div>
       </div>
     </div>
 

@@ -222,19 +222,20 @@ def AppPage(appName):
 	conn.close()
 	return render_template('page.html', app=app, platforms=platforms, shows=shows, videos=videos)	
 
-@app.route('/freevideos')
+@app.route('/freevideos', methods=['GET', 'POST'])
 def freevideos():
+	platform = ""
+	if request.method == 'POST':
+		platform = request.form['freesearch']
+	
 	conn = get_db_connection()
-	videos = conn.execute("SELECT video.VideoID as id, video.Title as title, app.Name as name" +
-							" FROM app INNER JOIN video ON app.Name = video.HostingApp" +
-							" WHERE video.isFree LIKE 1").fetchall()
-	platforms = conn.execute("SELECT platform.Name as name, video.VideoID as id" 
-		+ " FROM video INNER JOIN app on video.HostingApp = app.Name" 
-		+ " INNER JOIN appplatform ON app.Name = appplatform.AppName"
-        + " INNER JOIN platform on appplatform.PlatformID = platform.PlatformID"
-		+ " WHERE Video.isFree LIKE 1").fetchall()
+	videos = conn.execute("SELECT video.Title, video.VideoID"
+			+ " FROM video INNER JOIN app ON video.HostingApp = app.Name"
+			+ " INNER JOIN appplatform ON app.Name = appplatform.AppName"
+			+ " INNER JOIN platform ON appplatform.PlatformID = platform.PlatformID"
+			+ " WHERE platform.Name = '" + platform + "' AND video.isFree = '1'").fetchall()
 	conn.close()
-	return render_template('freevideos.html', videos=videos, platforms=platforms)
+	return render_template('freevideos.html', videos=videos, platform=platform)
 
 @app.route('/<showID>/showpage')
 def showpage(showID):
@@ -374,12 +375,17 @@ def admin():
 	if current_user.is_admin == False:
 		flash("You are not an administrator")
 		return redirect(url_for('index'))
+
+	revenueCountry = ""
+		
 	
 	conn = get_db_connection()
+
 	apps = conn.execute("SELECT appplatform.AppName, appplatform.PlatformID, appplatform.Version"
 				+ " FROM appplatform").fetchall()
 
-	videos = conn.execute("SELECT * FROM video").fetchall()
+	videos = conn.execute("SELECT * FROM video LEFT JOIN season ON video.Season = season.SeasonID"
+				+ " ORDER BY Season.SeasonNumber DESC, video.HostingApp").fetchall()
 	if request.method == 'POST':
 		if request.form['btn'] == 'Submit Query':
 			query = request.form['admin']
@@ -422,22 +428,21 @@ def admin():
 				return redirect(url_for('admin'))
 			except:
 				flash("Error: Video not added")
+		elif request.form['btn'] == 'Search':
+			revenueCountry = request.form['revenue']
 		else:
 			flash("ERROR")
 	
-	countries = conn.execute("SELECT DISTINCT user.Country FROM user ORDER BY user.Country").fetchall()
-	revenue = {}
-	for country in countries:
-		revenue[country['Country']] = conn.execute("SELECT appsubscription.AppName as name, IFNULL(SUM(appsubscription.Cost),0) as revenue"
-			+ " FROM appsubscription"
-			+ " INNER JOIN user ON appsubscription.UserEmail = user.Email"
-			+ " WHERE user.Country LIKE '%" + country['Country'] + "%'"
-			+ " GROUP BY appsubscription.AppName"
-			+ " ORDER BY SUM(appsubscription.Cost) DESC").fetchall()
 
-	
+	revenueapps = conn.execute("SELECT app.Name as name, IFNULL(SUM(appsubscription.Cost),0) as revenue"
+		" FROM  app INNER JOIN appsubscription ON app.Name = appsubscription.AppName"
+		" INNER JOIN user ON appsubscription.UserEmail = user.Email"
+		" WHERE user.Country = '" + revenueCountry + "'"
+		" GROUP BY app.Name"
+		" ORDER BY SUM(appsubscription.Cost) DESC").fetchall()
+
 	conn.close()
-	return render_template('admin.html', apps=apps, videos=videos, countries = countries, revenue=revenue)
+	return render_template('admin.html', revenueapps = revenueapps, revenueCountry=revenueCountry, apps=apps, videos=videos)
 	
 @app.route('/recentmovies')
 def recentmovies():
