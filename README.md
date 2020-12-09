@@ -10,6 +10,9 @@ Required Installations:
 - Flask_Login
 - Passlib
 
+Program Names:
+- yatv.py
+
 To run this web app in a VM, navigate to the YaTV directory, and execute the following commands:
 - export FLASK_APP=yatv.py
 - flask run
