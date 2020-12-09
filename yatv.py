@@ -558,8 +558,23 @@ def reports():
 	conn.close()
 	return render_template('reports.html', mobilecountries=mobilecountries, unwatched=unwatched, efficiency=efficiency)
 	
+@app.route('/videosearch', methods=['GET', 'POST'])
+def videosearch():
+
+	searchterm = None
 	
 
+	if request.method == 'POST':
+		searchterm = request.form['videosearch']
+	
+	conn = get_db_connection()
+	if searchterm:
+		videos = conn.execute("SELECT video.Title, video.VideoID FROM video WHERE video.Title LIKE '%" + searchterm + "%'").fetchall()
+	else:
+		videos = []
+		searchterm = ""
+	conn.close()
+	return render_template('videosearch.html', searchterm=searchterm, videos=videos)
 	
 	
 
