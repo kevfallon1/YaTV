@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="jumbotron">
+      <h5 class="display-4">Search For Videos</h5>
+        <form method="post">
+            <input type="text" id="videosearch" class="form-control" name="videosearch" placeholder="Enter video name"
+            value="{{ request.form['videosearch'] }}">
+            <input type="submit" class="btn btn-primary" value="Search">
+        </form>
+
+
+        <h5>You searched: {{ searchterm }}</h5>
+      {% for video in videos %}
+        <a style="color:#9932CC;" href="{{ url_for('videopage', videoID=video['VideoID']) }}">
+            <h2>{{ video['Title'] }}</h2>
+        </a>
+        <hr>
+    {% endfor %}
+    </div>
+{% endblock %}
