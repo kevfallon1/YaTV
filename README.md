@@ -1,6 +1,6 @@
 # YaTV
 
-Installation video: https://youtu.be/UHB_Z0kHEek       
+Installation video: https://youtu.be/u9oW3QQCkEI    
 Task/Report demonstration video: https://youtu.be/JZ0ItF-N3co
 
 Required Installations:
